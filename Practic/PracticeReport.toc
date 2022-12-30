@@ -1,0 +1,35 @@
+\babel@toc {russian}{}\relax 
+\contentsline {chapter}{Введение}{3}{}%
+\contentsline {chapter}{\numberline {1}Аналитическая часть}{5}{}%
+\contentsline {section}{\numberline {1.1}Описание объектов сцены}{5}{}%
+\contentsline {section}{\numberline {1.2}Анализ и выбор формы представления трехмерных моделей}{5}{}%
+\contentsline {section}{\numberline {1.3}Анализ способа представления поверхностных моделей}{6}{}%
+\contentsline {section}{\numberline {1.4}Анализ и выбор алгоритма удаления невидимых линий и поверхностей}{8}{}%
+\contentsline {subsection}{\numberline {1.4.1}Алгоритм, использующий Z-буфер}{8}{}%
+\contentsline {subsection}{\numberline {1.4.2}Алгоритм художника}{9}{}%
+\contentsline {subsection}{\numberline {1.4.3}Алгоритм обратной трассировки лучей}{9}{}%
+\contentsline {subsection}{\numberline {1.4.4}Алгоритм Робертса}{10}{}%
+\contentsline {subsection}{\numberline {1.4.5}Алгоритм марширования лучей}{12}{}%
+\contentsline {section}{\numberline {1.5}Анализ и выбор модели освещения}{13}{}%
+\contentsline {section}{\numberline {1.6}Анализ и выбор способа анимирования объектов сцены}{16}{}%
+\contentsline {chapter}{\numberline {2}Конструкторская часть}{18}{}%
+\contentsline {section}{\numberline {2.1}Описание представления объектов сцены}{18}{}%
+\contentsline {section}{\numberline {2.2}Общий алгоритм решения поставленной задачи}{19}{}%
+\contentsline {section}{\numberline {2.3}Алгоритм обратной трассировки лучей с использованием модели освещения Фонга}{20}{}%
+\contentsline {section}{\numberline {2.4}Алгоритмы пересечения луча с объектами}{21}{}%
+\contentsline {subsection}{\numberline {2.4.1}Описание алгоритма пересечения луча со сферой}{21}{}%
+\contentsline {subsection}{\numberline {2.4.2}Описание алгоритма пересечения луча с цилиндром}{22}{}%
+\contentsline {subsection}{\numberline {2.4.3}Описание алгоритма пересечения луча с параллелепипедом}{23}{}%
+\contentsline {section}{\numberline {2.5}Анимация методом ключевых кадров}{24}{}%
+\contentsline {chapter}{\numberline {3}Технологическая часть}{25}{}%
+\contentsline {section}{\numberline {3.1}Выбор языка программирования}{25}{}%
+\contentsline {section}{\numberline {3.2}Выбор средств разработки}{25}{}%
+\contentsline {section}{\numberline {3.3}Реализация алгоритмов}{26}{}%
+\contentsline {section}{\numberline {3.4}Тестирование}{31}{}%
+\contentsline {section}{\numberline {3.5}Реализация многопоточности}{35}{}%
+\contentsline {section}{\numberline {3.6}Формат описания сцены}{35}{}%
+\contentsline {chapter}{\numberline {4}Исследовательский раздел}{38}{}%
+\contentsline {section}{\numberline {4.1}Измерение быстродействия}{38}{}%
+\contentsline {section}{\numberline {4.2}Результат работы программы}{39}{}%
+\contentsline {chapter}{Заключение}{42}{}%
+\contentsline {chapter}{Список использованных источников}{43}{}%

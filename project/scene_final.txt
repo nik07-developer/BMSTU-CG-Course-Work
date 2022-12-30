@@ -1,0 +1,59 @@
+/camera 800 600 0.5
+
+/box gr 2500 60 2500 0 -130 200 0 0 0
+/paint gr 0 200 0
+
+/robot r1 0 0 225 0 180 0
+
+/human h1 300 0 150 0 90 0
+
+/human h2 -300 0 150 0 90 0
+
+/amb_light 0.2
+/dir_light 0.75 0 -0.6 1
+
+/anim r1
+/key 0 r1
+/key 7 r1
+/key 8 r1 0 0 225 0 135 0
+/key 12 r1 0 0 225 0 135 0
+/key 14 r1 0 0 225 0 180 0
+/key 15 r1 0 0 225 0 -135 0
+/key 16 r1 -100 0 200 0 -135 0
+/key 20 r1 -100 0 200 0 -135 0
+/key 22 r1 -100 0 200 0 -180 0
+
+/anim r1.head
+/key 0 r1.head
+/key 2 r1.head 0 0 0 0 45 0
+/key 6 r1.head 0 0 0 0 -45 0
+/key 7 r1.head 0 0 0 0 0 0
+
+/anim r1.lhand
+/key 0 r1.lhand
+/key 8 r1.lhand
+/key 10 r1.lhand 0 0 0 120 45 0
+/key 12 r1.lhand
+
+/anim r1.rhand
+/key 0 r1.rhand
+/key 8 r1.rhand
+/key 10 r1.rhand 0 0 0 120 -45 0
+/key 12 r1.rhand
+/key 16 r1.rhand
+/key 18 r1.rhand 0 0 0 45 0 0
+/key 20 r1.rhand
+
+
+/anim h2
+/key 0 h2
+/key 14 h2
+/key 16 h2 -300 0 150 0 45 0
+/key 20 h2 -300 0 150 0 45 0
+/key 22 h2
+
+/anim h2.rhand
+/key 0 h2.rhand
+/key 16 h2.rhand
+/key 18 h2.rhand 0 0 0 45 0 0
+/key 20 h2.rhand

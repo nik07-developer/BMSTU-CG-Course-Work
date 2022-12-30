@@ -1,0 +1,456 @@
+\chapter{Технологическая часть}
+
+\section{Выбор языка программирования}
+
+Существует множество языков программирования. К искомому языку были предъявлены два требования: наличие необходимой для выполнения задачи функциональности и наличие опыта разработки на данном языке.
+
+Для разработки данной программы был выбран язык C++. Данный выбор обусловлен тем, что этот язык удовлетворяет предъявляемым требованиям, а также имеет  следующии преимущества.
+
+1)	C++ позволяет применять технологию объектно-ориентированного программирования.
+
+2) C++ предоставляет механизмы для работы с нативными потоками, что позволит распараллелить вычисления~[8].
+
+\section{Выбор средств разработки}
+
+В качестве фреймворка выбран Qt, так как он содержит вcю необходимую функциональность и имеет подробную документацию.
+
+В качестве среды разработки была выбрана Visual Studio 2022 Preview. Причины, по которым была выбрана данная среда, приведены ниже.
+
+1)	Поддерживает разработку на C++ / Qt.
+
+2)  Включает такую функциональность, как отладчик, поддержка точек остановки, профилировщик.
+
+3)	Данная среда бесплатна для студентов.
+
+
+\section{Реализация алгоритмов}
+
+В листингах \ref{lst:sphere_hit}--\ref{lst:box_hit_end} представлена реализация алгоритмов нахождения пересечения луча с объектами сцены: сферой, цилиндром, параллелепипедом.
+
+\begin{center}
+	\captionsetup{justification=raggedright,singlelinecheck=off}
+	\begin{lstlisting}[label=lst:sphere_hit, caption=Алгоритм нахождения пересечения луча со сферой]
+	Hit3d Sphere::hit(Ray3d ray) const
+	{
+		Hit3d hit;
+		float x0 = ray.point.x - _transform.position.x;
+		float y0 = ray.point.y - _transform.position.y;
+		float z0 = ray.point.z - _transform.position.z;
+		float l = ray.direction.x;
+		float m = ray.direction.y;
+		float n = ray.direction.z;
+		float a = (l * l + m * m + n * n);
+		float k = (l * x0 + m * y0 + n * z0);
+		float c = (x0 * x0 + y0 * y0 + z0 * z0 - _radius * _radius);
+		float D1 = k * k - a * c;
+		if (D1 < 0)
+			hit.distance = -1.0;
+		else {
+			float t1 = (-k - sqrt(D1)) / a;
+			float t2 = (-k + sqrt(D1)) / a;
+			float t = fmin(t1, t2);
+			if (t < 0)
+				t = fmax(t1, t2);
+			hit.distance = t;
+			hit.point = ray.point + ray.direction * t;
+			hit.normal = (hit.point - _transform.position).normalized();
+			hit.color = _color;
+		}
+		return hit;
+	}
+	\end{lstlisting}
+\end{center}
+
+\clearpage
+
+\begin{center}
+	\captionsetup{justification=raggedright,singlelinecheck=off}
+	\begin{lstlisting}[label=lst:cylinder_hit_begin, caption=Алгоритм нахождения пересечения луча с цилиндром (начало)]
+	Hit3d Cylinder::hit(Ray3d ray) const {
+		Hit3d hit;
+		hit.distance = -1.0f;
+		_transform.rayToLocal(ray);
+		float x0 = ray.point.x;
+		float y0 = ray.point.y;
+		float z0 = ray.point.z;
+		float l = ray.direction.x;
+		float m = ray.direction.y;
+		float n = ray.direction.z;
+		if (fabs(n) > EPS) {
+			float z = _height / 2;
+			float t = (z - z0) / n;
+			float x = l * t + x0;
+			float y = m * t + y0;
+			if (t > 0 && x * x + y * y <= _radius * _radius) {
+				hit.distance = t;
+				hit.point = Vector3d(x, y, z);
+				hit.normal = Vector3d::forward();
+			}
+			z = -z;
+			t = (z - z0) / n;
+			x = l * t + x0;
+			y = m * t + y0;
+			if (t > 0 && x * x + y * y <= _radius * _radius) {
+				if ((hit.distance > 0 && t < hit.distance) || hit.distance < 0) {
+					hit.distance = t;
+					hit.point = Vector3d(x, y, z);
+					hit.normal = Vector3d::back();
+				}
+			}
+		}
+		//...
+	\end{lstlisting}
+\end{center}
+
+\clearpage
+
+\begin{center}
+	\captionsetup{justification=raggedright,singlelinecheck=off}
+	\begin{lstlisting}[label=lst:cylinder_hit_end, caption=Алгоритм нахождения пересечения луча с цилиндром (окончание)]
+		//...
+		float a = (l * l + m * m);
+		float k = (l * x0 + m * y0);
+		float c = (x0 * x0 + y0 * y0 - _radius * _radius);
+		float D1 = k * k - a * c;		
+		if (D1 >= 0) {
+			float t1 = (-k - sqrt(D1)) / a;
+			float t2 = (-k + sqrt(D1)) / a;
+			float t = fmin(t1, t2);
+			if (t < 0)
+			t = fmax(t1, t2);
+			if (t > 0 && fabs(n * t + z0) < _height / 2) {
+				if ((hit.distance > 0 && t < hit.distance) || hit.distance < 0) {
+					hit.distance = t;
+					hit.point = ray.point + ray.direction * t;
+					hit.normal = Vector3d(l * t + x0,
+						 m * t + y0, 0).normalized();
+				}
+			}
+		}
+		if (hit.distance > 0) {
+			_transform.hitToGlobal(hit);
+			hit.color = _color;
+		}
+	
+		return hit;
+	}
+	\end{lstlisting}
+\end{center}
+
+\clearpage
+
+\begin{center}
+	\captionsetup{justification=raggedright,singlelinecheck=off}
+	\begin{lstlisting}[label=lst:box_hit_begin, caption=Алгоритм нахождения пересечения луча с параллелепипедом (начало)]
+	Hit3d Box::hit(Ray3d ray) const {
+		Hit3d hit;
+		hit.distance = -1.0f;
+		_transform.rayToLocal(ray);
+		float p[3] = { ray.point.x, ray.point.y, ray.point.z };
+		float d[3] = { ray.direction.x, ray.direction.y, ray.direction.z };
+		float tn = std::numeric_limits<float>::min();
+		float tf = std::numeric_limits<float>::max();
+		for (int i = 0; i < 3; i++)
+			if (fabs(d[i]) < 1e-12) {
+				if (p[i] < _b1[i] || p[i] > _b2[i])
+				return hit;
+			}
+			else {
+				float t1 = (_b1[i] - p[i]) / d[i];
+				float t2 = (_b2[i] - p[i]) / d[i];
+				if (t1 > t2)
+				std::swap(t1, t2);
+				tn = fmax(tn, t1);
+				tf = fmin(tf, t2);
+				if (tn > tf || tf < 0)
+					return hit;
+			}
+		
+			//...
+	\end{lstlisting}
+\end{center}
+
+\clearpage
+
+\begin{center}
+	\captionsetup{justification=raggedright,singlelinecheck=off}
+	\begin{lstlisting}[label=lst:box_hit_end, caption=Алгоритм нахождения пересечения луча с параллелепипедом (окончание)]
+			//...
+			
+			if (0 < tn && tn < tf) {
+				hit.distance = tn;
+				hit.point = ray.point + ray.direction * tn;
+				if (fabs(hit.point.x - _b1[0]) < 1e-3) hit.normal = Vector3d::left();
+				else if (fabs(hit.point.x - _b2[0]) < EPS) hit.normal = Vector3d::right();
+				else if (fabs(hit.point.y - _b1[1]) < EPS) hit.normal = Vector3d::down();
+				else if (fabs(hit.point.y - _b2[1]) < EPS) hit.normal = Vector3d::up();
+				else if (fabs(hit.point.z - _b1[2]) < EPS) hit.normal = Vector3d::back();
+				else if (fabs(hit.point.z - _b2[2]) < EPS) hit.normal = Vector3d::forward();
+				
+				_transform.hitToGlobal(hit);
+				hit.color = _color;
+			}
+			
+			return hit;
+		}
+	\end{lstlisting}
+\end{center}
+
+\clearpage
+
+\section{Тестирование}
+
+В таблице \ref{tbl:local-global} приведены тесты для функций перевода точки из глобальной системы координат в систему координат объекта сцены, т.е. в локальную систему координат и обратно. Transform тела --- структура данных, состоящая из глобальных координат тела и углов (в градусах) поворота объекта вдоль осей координат, относительно центра объекта.
+
+\begin{table}[h]
+	\begin{center}
+		\begin{threeparttable}
+			\captionsetup{justification=raggedright,singlelinecheck=off}
+			\caption{Тестирование алгоритма перевода точки между глобальной и локальной системами координат}
+			\label{tbl:local-global}
+			\begin{tabular}{|c|c|c|}
+				\hline
+				Глобальные & Transform & Локальные \\
+				координаты & объекта сцены & координаты \\
+				\hline
+				(1, 1, 1) & (0, 0, 0), (0, 0, 0) & (1, 1, 1)   \\
+				\hline
+				(1, 1, 1) & (1, 1, 1), (0, 0, 0) & (0, 0, 0)   \\
+				\hline
+				(0, 0, 0) & (1, 1, 1), (0, 0, 0) & (-1, -1, -1)   \\
+				\hline
+				(2, 2, 2) & (1, 1, 1), (30, 0, 0) & (1, 1.37, 0.37)   \\
+				\hline
+				(2, 2, 2) & (1, 1, 1), (0, 60, 0) & (0, 1, 1.41)   \\
+				\hline
+				(2, 2, 2) & (1, 1, 1), (0, 0, 90) & (-0.37, 1.37, 1)   \\
+				\hline
+				(50, 50, 50) & (-50, -50, -50), (45, 0, 0) & (100, 141.42, 0)\\
+				\hline
+				(50, 50, 50) & (-50, -50, -50), (45, 45, 0) & (0, 170.71, 29.29)\\
+				\hline
+				(50, 50, 50) & (-50, -50, -50), (45, 45, 45) & (-70.71, 150, -50)\\
+				\hline
+				(50, 50, 50) & (-50, -50, -50), (0, 45, 45) & (-70.71, 141.42, 70.71)\\
+				\hline
+				(50, 50, 50) & (-50, -50, -50), (45, 0, 45) & (0, 170.71, -29.29)\\
+				\hline
+				(10, 20, 30) & (30, 20, 10), (15, 30, 90) & (-10, -14.84, 21.91)\\
+				\hline
+			\end{tabular}
+		\end{threeparttable}
+	\end{center}
+\end{table}
+
+В таблицах \ref{tbl:test_sph_hit} -- \ref{tbl:test_box_hit} приведены тесты для функций нахождения пересечения луча с объектами сцены: сферой, цилиндром, параллелепипедом.
+
+\clearpage
+
+\begin{table}[h]
+	\begin{center}
+		\begin{threeparttable}
+			\captionsetup{justification=raggedright,singlelinecheck=off}
+			\caption{Тестирование алгоритма нахождения пересечения луча со сферой}
+			\label{tbl:test_sph_hit}
+			\begin{tabular}{|c|c|c|c|c|}
+				\hline
+				Начало  & Направление  & Координаты  & Радиус & Точка \\
+				 луча &  луча &  сферы & сферы & пересечения \\
+				\hline
+				(0, 0, 0) & (1, 0, 0) & (0, 0, 0) & 10 & (10, 0, 0) \\
+				\hline
+				(-20, 0, 0) & (1, 0, 0) & (0, 0, 0) & 10 & (-10, 0, 0) \\
+				\hline
+				(-20, 0, 0) & (-1, 0, 0) & (0, 0, 0) & 10 & --- \\
+				\hline
+				 (0, 50, 50) & (1, 0, 0) & (0, 50, 50) & 10 & (10, 50, 50) \\
+				\hline
+				(-20, 50, 50) & (1, 0, 0) & (0, 50, 50) & 10 & (-10, 50, 50) \\
+				\hline
+				(-20, 50, 50) & (-1, 0, 0) & (0, 50, 50) & 10 & --- \\
+				\hline
+				(-1, -1, -1) & (1, 1, 1) & (50, 50, 50) & 10 & (44.23, 44.23, 44.23) \\
+				\hline
+				(0, 0, -50) & (0, 0 1) & (0, -50, 0) & 50 & (0, 0, 0) \\
+				\hline
+				(0, 1, -10) & (1, 0, 1) & (0, -50, 0) & 50 & --- \\
+				\hline
+			\end{tabular}
+		\end{threeparttable}
+	\end{center}
+\end{table}
+
+\begin{table}[h]
+	\begin{center}
+		\begin{threeparttable}
+			\captionsetup{justification=raggedright,singlelinecheck=off}
+			\caption{Тестирование алгоритма нахождения пересечения луча с цилиндром}
+			\label{tbl:test_cyl_hit}
+			\begin{tabular}{|c|c|c|c|c|}
+				\hline
+				Начало  & Направление  & Transform  & Радиус & Точка \\
+				луча &  луча &  цилиндра & и высота & пересечения \\
+				\hline
+				(0, 0, 0) & (1, 0, 0) & (0, 0, 0), (0, 0, 0) & 10, 25 & (10, 0, 0) \\
+				\hline
+				(0, 0, 0) & (0, 1, 0) & (0, 0, 0), (0, 0, 0) & 10, 25 & (0, 10, 0) \\
+				\hline
+				(0, 0, 0) & (0, 0, 1) & (0, 0, 0), (0, 0, 0) & 10, 25 & (0, 0, 12.5) \\
+				\hline
+				(100, 0, 0) & (-1, 0, 0) & (0, 0, 0), (0, 0, 0) & 10, 25 & (10, 0, 0) \\
+				\hline
+				(0, 100, 0) & (0, -1, 0) & (0, 0, 0), (0, 0, 0) & 10, 25 & (0, 10, 0) \\
+				\hline
+				(0, 0, 100) & (0, 0, -1) & (0, 0, 0), (0, 0, 0) & 10, 25 & (0, 0, 12.5) \\
+				\hline
+				(100, 0, 0) & (1, 0, 0) & (0, 0, 0), (0, 0, 0) & 10, 25 & --- \\
+				\hline
+				(0, 100, 0) & (0, 1, 0) & (0, 0, 0), (0, 0, 0) & 10, 25 & --- \\
+				\hline
+				(0, 0, 100) & (0, 0, 1) & (0, 0, 0), (0, 0, 0) & 10, 25 & --- \\
+				\hline
+				(0, 0, 0) & (1, 0, 0) & (200, 0, 0), (0, 0, 0) & 25, 25 & (175, 0, 0) \\
+				\hline
+				(0, 0, 0) & (0, 1, 0) & (0, 200, 0), (0, 0, 0) & 25, 25 & (0, 175, 0) \\
+				\hline
+				(0, 0, 0) & (0, 0, 1) & (0, 0, 200), (0, 0, 0) & 25, 25 & (0, 0, 187.5) \\
+				\hline
+				(0, 0, -50) & (1, 1, 0) & (0, 0, 200), (0, 0, 0) & 25, 75 & --- \\
+				\hline
+				(0, 100, 0) & (0, 0, -1) & (0, 0, 200), (0, 0, 0) & 25, 75 & --- \\
+				\hline
+				(0, 0, 100) & (0, 0, -1) & (0, 0, 0), (90, 0, 0) & 10, 25 & (0, 0, 10) \\
+				\hline
+				(0, 0, 100) & (0, 0, -1) & (0, 0, 0), (0, 90, 0) & 10, 25 & (0, 0, 10) \\
+				\hline
+				(50, 0, -300) & (0, 0, 1) & (0, 0, 50), (0, 0, 0) & 25, 125 & --- \\
+				\hline
+				(50, 0, -300) & (0, 0, -1) & (0, 0, 50), (0, 45, 0) & 25, 125 & (50, 0, 64.64) \\
+				\hline
+				(50, 0, -300) & (0, 0, -1) & (0, 0, 50), (0, 90, 0) & 25, 125 &  (50, 0, 25)\\
+				\hline
+				(0, 0, -50) & (0, 1, 1) & (0, 0, 0), (0, 0, 0) & 25, 75 &  (0, 12.5, -37.5)\\
+				\hline
+				(0, 0, -50) & (0, 1, 1) & (0, 0, 0), (-30, 0, 0) & 25, 75 &  ---\\
+				\hline
+				(0, 0, -50) & (0, 1, 1) & (0, 0, 0), (-30, 180, 0) & 25, 75 & (0, 15.85, -34.15)\\
+				\hline
+			\end{tabular}
+		\end{threeparttable}
+	\end{center}
+\end{table}
+
+\begin{table}[h]
+	\begin{center}
+		\begin{threeparttable}
+			\captionsetup{justification=raggedright,singlelinecheck=off}
+			\caption{Тестирование алгоритма нахождения пересечения луча с параллелепипедом}
+			\label{tbl:test_box_hit}
+			\begin{tabular}{|c|c|c|c|c|}
+				\hline
+				Начало  & Направление  & Transform  & Размер & Точка \\
+				луча &  луча &  параллелепипеда  &   & пересечения \\
+				\hline
+				(0, 0, 0) & (1, 0, 0) & (0, 0, 0), (0, 0, 0) & (10, 10, 10) & (5, 0, 0) \\
+				\hline
+				(0, 0, 0) & (0, 1, 0) & (0, 0, 0), (0, 0, 0) & (10, 10, 10) & (0, 5, 0) \\
+				\hline
+				(0, 0, 0) & (0, 0, 1) & (0, 0, 0), (0, 0, 0) & (10, 10, 10) & (0, 0, 5) \\
+				\hline
+				(-200, 0, 0) & (1, 0, 0) & (0, 0, 0), (0, 0, 0) & (10, 10, 10) & (-5, 0, 0) \\
+				\hline
+				(0, -200, 0) & (0, 1, 0) & (0, 0, 0), (0, 0, 0) & (10, 10, 10) & (0, -5, 0) \\
+				\hline
+				(0, 0, -200) & (0, 0, 1) & (0, 0, 0), (0, 0, 0) & (10, 10, 10) & (0, 0, -5) \\
+				\hline
+				(-200, 0, 0) & (1, 0, 0) & (0, 0, 0), (0, 0, 0) & (5, 10, 15) & (-2.5, 0, 0) \\
+				\hline
+				(0, -200, 0) & (0, 1, 0) & (0, 0, 0), (0, 0, 0) & (5, 10, 15) & (0, -5, 0) \\
+				\hline
+				(0, 0, -200) & (0, 0, 1) & (0, 0, 0), (0, 0, 0) & (5, 10, 15) & (0, 0, -7.5) \\
+				\hline
+				(-100, 0, 0) & (1, 0, 0) & (0, 0, 50), (0, 0, 0) & (30, 40, 50) & --- \\
+				\hline
+				(0, -100, 0) & (0, 1, 0) & (0, 0, 50), (0, 0, 0) & (30, 40, 50) & --- \\
+				\hline
+				(0, 50, -100) & (0, 0, 1) & (0, 0, 50), (0, 0, 0) & (30, 40, 50) & --- \\
+				\hline
+				(0, 0, 0) & (1, 1, 1) & (0, 0, 50), (0, 0, 0) & (100, 60, 40) & --- \\
+				\hline
+				(0, 0, 0) & (1, 1, 1) & (0, 0, 50), (0, 45, 0) & (100, 60, 40) & (10.86, 10.86, \\
+				 &  &  &  & 10.86) \\
+				\hline
+				(0, 0, 0) & (1, 1, 1) & (0, 0, 50), (15, 30, 15) & (100, 60, 40) & (25.35, 25.35, \\
+				 &  &  &  &  25.35) \\
+				\hline
+				(0, 0, -50) & (0.2, 0, 1) & (0, 0, 20), (0, 0, 0) & (10, 40, 40) & --- \\
+				\hline
+				(0, 0, -50) & (0.2, 0, 1) & (0, 0, 20), (0, 0, 90) & (10, 40, 40) & (5, 0, 0) \\
+				\hline
+				
+			\end{tabular}
+		\end{threeparttable}
+	\end{center}
+\end{table}
+
+\clearpage
+
+\section{Реализация многопоточности}
+
+Параллельные вычисления были реализованы с помощью стандартного класса std::thread[8]. В качестве примитивов синхронизации были использованы классы группы std::atomic[9].
+
+Обработка пользовательского интерфейса была вынесена в отдельный поток, что позволило сохранить отзывчивость интерфейса во время генерации изображения сцены.
+
+\section{Формат описания сцены}
+
+Описание сцены и анимации её объектов может быть выполненно с помощью текстового файла, составленного по определенным правилам. Каждая строка файла может содержать одну команду и необходимые для неё аргументы.
+Команды могут добавлять на сцену объекты, менять их состояние, а также создавать ключевые карды для анимации. Доступен следующий список команд.
+
+\begin{enumerate}
+	\item /camera <w> <h> <d> --- добавляет на сцену камеру, с разрешением экрана w на h и отношением ширины к расстоянию до экранной плоскости d (w, h --- целые числа, d --- вещественное число).
+	\item /amb\_light <i> --- добавляет на сцену рассеянное освещение, интенсивностью i (i --- вещественное число).
+	\item /dir\_light <i> <x> <y> <z> --- добавляет на сцену источник направленного по вектору (x, y, z) света, с интенсивностью i (i, x, y, z --- вещественные числа).
+	\item /robot <name> <px> <py> <pz> <rx> <ry> <rz> --- добавляет на сцену  в точке (px, py, pz) модель робота, повёрнутую относительно осей координат на величины rx, ry, rz; <name> --- строка --- используется для указания этого робота в качестве цели для других команд (<px>, ..., <rz> --- вещественные числа).
+	\item /human <name> <px> <py> <pz> <rx> <ry> <rz> --- добавляет на сцену модель человека, аргументы используются аналогично команде /robot.
+	\item /paint <name> <r> <g> <b> --- изменяет цвет объекта name на (r, g, b), где r, g, b --- целые числа от 0 до 255.
+	\item /anim <name> --- обозначает, что объект name будет анимирован. 
+	\item /key <t> <name> [<px> <py> <pz> <rx> <ry> <rz>] --- обозначает кадр номер t как ключевой в анимации объекта name. Если указаны параметры [px, ..., rz], то в данном кадре объект будет находиться в точке (px, py, pz) и будет повёрнут относительно осей координат на величины rx, ry, rz в градусах (t --- неотрицательное целое число, <px>, ..., <rz> --- вещественные числа). Если параметры не указаны, на кадре t объект будет представлен в том же состоянии, что было указано при его создании. Примечание: части тела робота и человека могут быть анимированны отдельно, для чего нужно использовать указания на части объекта: name.head, name.body, name.lhand и name.rhand. Смещение и вращение для частей тела указываются относительно их точки крепления к объекту, а не глобальной системы координат.
+
+\end{enumerate}
+
+В листинге \ref{lst:scene_txt} описана сцена, состоящая из поверхности пола, робота, человека и источника света. Робот анимирован: сначала он поворачивается в сторону человека, а затем машет ему руками.
+
+\clearpage
+
+\begin{center}
+	\captionsetup{justification=raggedright,singlelinecheck=off}
+	\begin{lstlisting}[label=lst:scene_txt, caption=Пример файла описания сцены]
+		/camera 800 600 0.5
+		
+		/box gr 2500 50 2500 0 -130 200 0 0 0
+		/paint gr 0 200 0
+		
+		/robot r1 0 0 200 0 180 0
+		
+		/human h1 300 0 150 0 90 0
+		
+		/amb_light 0.2
+		/dir_light 0.75 0 -0.2 1
+		
+		/anim r1
+		/key 0 r1
+		/key 5 r1 0 0 200 0 135 0
+		
+		/anim r1.lhand
+		/key 0 r1.lhand
+		/key 5 r1.lhand
+		/key 15 r1.lhand 0 0 0 120 45 0
+		
+		/anim r1.rhand
+		/key 0 r1.rhand
+		/key 5 r1.rhand
+		/key 15 r1.rhand 0 0 0 120 -45 0
+\end{lstlisting}
+\end{center}
+
+\clearpage

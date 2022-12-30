@@ -1,0 +1,63 @@
+\documentclass[a4paper, 14pt]{report} %размер бумаги устанавливаем А4, шрифт 12пунктов
+\usepackage{extsizes}
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}%включаем свою кодировку: koi8-r или utf8 в UNIX, cp1251 в Windows
+\usepackage[english,russian]{babel}%используем русский и английский языки с переносами
+\usepackage{amssymb,amsfonts,amsmath,mathtext,cite,enumerate,float} %подключаем нужные пакеты расширений
+\usepackage[final]{graphicx} %хотим вставлять в диплом рисунки?
+\graphicspath{{images/}}%путь к рисункам
+
+\usepackage{caption} %заголовки плавающих объектов
+
+\captionsetup[figure]{name=Рисунок} %тут можно вписать много опций, но я оставил только касающуюся вопроса
+
+\usepackage{ccaption}
+\captiondelim{. } % после точки стоит пробел! для подписи рисунков
+
+\makeatletter
+\renewcommand{\@biblabel}[1]{#1.} % Заменяем библиографию с квадратных скобок на точку:
+\makeatother
+
+\usepackage{tocloft} % точки в оглавлении
+\usepackage{indentfirst} % отступ в первом абзаце
+
+\usepackage{geometry} % Меняем поля страницы
+\geometry{left=2cm}% левое поле
+\geometry{right=1.5cm}% правое поле
+\geometry{top=1cm}% верхнее поле
+\geometry{bottom=2cm}% нижнее поле
+
+\renewcommand{\theenumi}{\arabic{enumi}}% Меняем везде перечисления на цифра.цифра
+\renewcommand{\labelenumi}{\arabic{enumi}.}% Меняем везде перечисления на цифра.цифра.
+\renewcommand{\theenumii}{.\arabic{enumii}}% Меняем везде перечисления на цифра.цифра
+\renewcommand{\labelenumii}{\arabic{enumi}.\arabic{enumii}.}% Меняем везде перечисления на цифра.цифра
+\renewcommand{\theenumiii}{.\arabic{enumiii}}% Меняем везде перечисления на цифра.цифра
+\renewcommand{\labelenumiii}{\arabic{enumi}.\arabic{enumii}.\arabic{enumiii}.}% Меняем везде перечисления на цифра.цифра
+
+\usepackage{setspace} % изменяем межстрочный интервал
+\setstretch{1.5}
+
+\usepackage{titlesec, blindtext}
+\titleformat{\chapter}[hang]{\Huge\bfseries}{\thechapter{.} }{0pt}{\Huge\bfseries}
+
+\usepackage{threeparttable}
+
+\usepackage{listings}
+\usepackage{xcolor}
+
+% Для листинга кода:
+\lstset{%
+	language=C++,   			 	% выбор языка для подсветки	
+	basicstyle=\small\sffamily,			% размер и начертание шрифта для подсветки кода
+	numbers=left,						% где поставить нумерацию строк (слева\справа)
+	%numberstyle=,					% размер шрифта для номеров строк
+	stepnumber=1,						% размер шага между двумя номерами строк
+	numbersep=5pt,						% как далеко отстоят номера строк от подсвечиваемого кода
+	frame=single,						% рисовать рамку вокруг кода
+	tabsize=4,							% размер табуляции по умолчанию равен 4 пробелам
+	captionpos=t,						% позиция заголовка вверху [t] или внизу [b]
+	breaklines=true,					
+	breakatwhitespace=true,				% переносить строки только если есть пробел
+	escapeinside={\#*}{*)},				% если нужно добавить комментарии в коде
+	backgroundcolor=\color{white},
+}

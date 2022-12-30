@@ -1,0 +1,25 @@
+/camera 800 600 0.5
+
+/box gr 2500 60 2500 0 -130 200 0 0 0
+/paint gr 0 200 0
+
+/robot r1 0 0 200 0 180 0
+
+/human h1 300 0 150 0 -120 0
+
+/amb_light 0.2
+/dir_light 0.75 0 -0.25 1
+
+/anim r1
+/key 0 r1
+/key 5 r1 0 0 200 0 135 0
+
+/anim r1.lhand
+/key 0 r1.lhand
+/key 5 r1.lhand
+/key 15 r1.lhand 0 0 0 120 45 0
+
+/anim r1.rhand
+/key 0 r1.rhand
+/key 5 r1.rhand
+/key 15 r1.rhand 0 0 0 120 -45 0

@@ -1,0 +1,10 @@
+/camera 800 600 0.5
+
+/human r1 0 0 200 0 0 0
+
+/human r2 0 200 200 0 0 0
+
+/human r3 0 -200 200 0 0 0
+
+/amb_light 0.2
+/dir_light 0.75 0 -0.25 1
